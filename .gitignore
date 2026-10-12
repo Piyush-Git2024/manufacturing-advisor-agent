@@ -3,18 +3,18 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Virtual Env
-ven**
+# Virtual Environment
+venv/
 
 # VS Code
 .vscode/
 
-#*Environment
+# Environment
 .env
 
-# SQLite temp fi*es
-*.*b-journal
+# SQLite
+*.db-journal
 
-# OS*files
+# OS
 Thumbs.db
-.DS*Store
+.DS_Store
