@@ -26,7 +26,7 @@ def health():
 def agent_card():
 
     card = {
-        "protocolVersion": "0.2.5",
+        "protocolVersion": "0.3.0",
 
         "capabilities": {
             "streaming": False,
