@@ -4,6 +4,12 @@ from services.advisor_service import get_advisor_response
 
 app = Flask(__name__)
 
+NGROK_URL = "https://enjoyer-jellied-gloss.ngrok-free.dev"
+
+
+# ==========================================================
+# Health Endpoint
+# ==========================================================
 @app.route("/health")
 def health():
 
@@ -11,76 +17,121 @@ def health():
         "service": "Manufacturing Advisor A2A",
         "status": "UP"
     }
-@app.route("/.well-known/agent.json")
+
+
+# ==========================================================
+# Agent Card
+# ==========================================================
+@app.route("/.well-known/agent.json", methods=["GET"])
 def agent_card():
 
     card = {
-        "name": "Manufacturing Advisor Agent",
-        "description": "AI agent that analyzes production, quality, maintenance and operational risks.",
-        "url": "",
-        "version": "1.0.0",
-
-        "protocolVersion": "0.3.0",
+        "protocolVersion": "0.2.5",
 
         "capabilities": {
-            "streaming": False
+            "streaming": False,
+            "pushNotifications": False
         },
 
-        "defaultInputModes": [
-            "text"
-        ],
+        "description":
+        "Provides manufacturing production, quality, maintenance and operational risk assessment",
 
-        "defaultOutputModes": [
-            "text"
-        ],
+        "name":
+        "Manufacturing Advisor Agent",
 
         "skills": [
             {
-                "id": "manufacturing-analysis",
-                "name": "Manufacturing Analysis",
                 "description":
-                "Production, quality, maintenance and risk analysis."
+                "Production, quality, maintenance and risk analysis",
+
+                "id":
+                "manufacturing-analysis",
+
+                "inputModes": [
+                    "text/plain"
+                ],
+
+                "name":
+                "Manufacturing Analysis",
+
+                "outputModes": [
+                    "text/plain"
+                ],
+
+                "tags": []
             }
-        ]
+        ],
+
+        "url": NGROK_URL,
+
+        "version": "1.0.0"
     }
 
     return jsonify(card)
-@app.route("/", methods=["POST"])
-def handle_message():
 
-    data = request.get_json()
 
-    if not data:
-        return jsonify({
-            "error": "Invalid request"
-        }), 400
+# ==========================================================
+# A2A Endpoint
+# ==========================================================
+@app.route("/", methods=["GET", "POST"])
+def home():
+
+    if request.method == "GET":
+        return "Manufacturing Advisor Agent Running"
+
+    payload = request.get_json(silent=True) or {}
+
+    request_id = payload.get("id", "1")
+
+    params = payload.get("params", {})
+    message = params.get("message", {})
+
+    task_id = (
+        params.get("id")
+        or message.get("messageId")
+        or "manufacturing-task-001"
+    )
+
+    question = ""
 
     try:
-        question = (
-            data["params"]
-                ["message"]
-                ["parts"][0]
-                ["text"]
-        )
-
+        question = message["parts"][0]["text"]
     except Exception:
         question = "help"
+
+    print("\n===================================")
+    print("QUESTION RECEIVED")
+    print(question)
+    print("===================================\n")
 
     answer = get_advisor_response(question)
 
     response = {
         "jsonrpc": "2.0",
-        "id": data.get("id"),
+
+        "id": request_id,
+
         "result": {
+            "id": task_id,
+
             "kind": "task",
+
             "status": {
                 "state": "completed"
             },
+
             "artifacts": [
                 {
+                    "name": "manufacturing-analysis",
+
+                    "index": 0,
+
                     "parts": [
                         {
                             "kind": "text",
+
+                            "type": "text",
+
                             "text": answer
                         }
                     ]
@@ -89,11 +140,16 @@ def handle_message():
         }
     }
 
-    print("Question:", question)
-    print("Answer:", answer)
+    print("\nRESPONSE SENT")
+    print(answer)
+    print()
 
     return jsonify(response)
 
+
+# ==========================================================
+# Start Application
+# ==========================================================
 if __name__ == "__main__":
 
     app.run(
