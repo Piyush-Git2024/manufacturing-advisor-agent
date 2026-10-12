@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual Env
+ven**
+
+# VS Code
+.vscode/
+
+#*Environment
+.env
+
+# SQLite temp fi*es
+*.*b-journal
+
+# OS*files
+Thumbs.db
+.DS*Store
