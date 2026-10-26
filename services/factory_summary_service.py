@@ -307,3 +307,138 @@ def get_executive_risk_summary():
     conn.close()
 
     return "\n".join(summary)
+
+def get_plant_risk_ranking():
+
+    conn = sqlite3.connect(DB_NAME)
+
+    cursor = conn.cursor()
+
+    plant_scores = {}
+
+    # ============================================
+    # PLANTS
+    # ============================================
+
+    cursor.execute("""
+    SELECT PlantID
+    FROM Plants
+    """)
+
+    plants = [row[0] for row in cursor.fetchall()]
+
+    for plant in plants:
+
+        score = 0
+
+        # ========================================
+        # PRODUCTION SHORTFALL
+        # ========================================
+
+        cursor.execute("""
+        SELECT
+            AVG(TargetProduction) -
+            AVG(ActualProduction)
+        FROM ProductionHistory
+        WHERE PlantID = ?
+        """, (plant,))
+
+        production_gap = cursor.fetchone()[0] or 0
+
+        score += production_gap * 0.40
+
+        # ========================================
+        # QUALITY
+        # ========================================
+
+        cursor.execute("""
+        SELECT
+            AVG(DefectRate)
+        FROM QualityHistory
+        WHERE PlantID = ?
+        """, (plant,))
+
+        defect_rate = cursor.fetchone()[0] or 0
+
+        score += defect_rate * 20
+
+        # ========================================
+        # INCIDENTS
+        # ========================================
+
+        cursor.execute("""
+        SELECT COUNT(*)
+        FROM OperationalIncidents oi
+        JOIN Machines m
+             ON oi.MachineID = m.MachineID
+        JOIN ProductionLines pl
+             ON m.LineID = pl.LineID
+        WHERE pl.PlantID = ?
+        """, (plant,))
+
+        incidents = cursor.fetchone()[0] or 0
+
+        score += incidents * 10
+
+        # ========================================
+        # MACHINE HEALTH
+        # ========================================
+
+        cursor.execute("""
+        SELECT AVG(mhh.Temperature)
+        FROM MachineHealthHistory mhh
+        JOIN Machines m
+             ON mhh.MachineID = m.MachineID
+        JOIN ProductionLines pl
+             ON m.LineID = pl.LineID
+        WHERE pl.PlantID = ?
+        """, (plant,))
+
+        temp = cursor.fetchone()[0] or 0
+
+        score += temp * 0.25
+
+        plant_scores[plant] = round(score, 2)
+
+    conn.close()
+
+    # ============================================
+    # SORT
+    # ============================================
+
+    ranking = sorted(
+        plant_scores.items(),
+        key=lambda x: x[1],
+        reverse=True
+    )
+
+    # ============================================
+    # BUILD REPORT
+    # ============================================
+
+    report = []
+
+    report.append("PLANT RISK RANKING")
+    report.append("")
+
+    position = 1
+
+    for plant, score in ranking:
+
+        if position == 1:
+            risk = "HIGH"
+
+        elif position == 2:
+            risk = "MEDIUM"
+
+        else:
+            risk = "LOW"
+
+        report.append(
+            f"{position}. {plant} - {risk} RISK "
+            f"(Score: {score})"
+        )
+
+        position += 1
+
+    return "\n".join(report)
