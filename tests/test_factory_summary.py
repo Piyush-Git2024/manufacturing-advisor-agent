@@ -11,10 +11,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from services.factory_summary_service import (
     get_factory_summary,
     get_executive_risk_summary,
-    get_plant_risk_ranking
+    get_plant_risk_ranking,
+    get_management_dashboard
 )
 
 print("\n")
-print(get_executive_risk_summary())
 print()
-print(get_plant_risk_ranking())
+print(get_management_dashboard())

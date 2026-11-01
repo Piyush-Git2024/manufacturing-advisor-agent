@@ -1,3 +1,54 @@
+
+# Manufacturing Operations Control Tower
+
+AI-powered manufacturing intelligence platform built using:
+
+- Streamlit
+- LangChain
+- SQLite
+- Ollama
+- FastAPI
+- Pega Integration
+
+## Features
+
+✅ Executive Dashboard
+
+✅ Production Analytics
+
+✅ Quality Analytics
+
+✅ Maintenance Analytics
+
+✅ AI Manufacturing Advisor
+
+✅ Manufacturing Risk Analysis
+
+## Architecture
+
+User Interface (Streamlit)
+        ↓
+Manufacturing Advisor API
+        ↓
+LangChain Analytics Layer
+        ↓
+SQLite Manufacturing Data
+        ↓
+Ollama
+
+## Screenshots
+
+(Add screenshots here)
+
+## Future Roadmap
+
+- Multi-Agent Architecture
+- MCP Support
+- Claude Integration
+- Predictive Maintenance
+- Production Forecasting
+
+
 Manufacturing Advisor Agent
 Overview
 

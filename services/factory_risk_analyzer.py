@@ -1,54 +1,58 @@
-from tools.production_tool import get_production_analysis
-from tools.quality_tool import get_quality_analysis
-from tools.maintenance_tool import get_maintenance_analysis
+from services.factory_summary_service import (
+    get_management_dashboard
+)
+
 from llm_service import ask_llm
 
 
 def get_factory_risk_analysis():
 
-    production = get_production_analysis()
-    quality = get_quality_analysis()
-    maintenance = get_maintenance_analysis()
+    dashboard = get_management_dashboard()
 
     prompt = f"""
-You are a senior manufacturing consultant.
+You are a Manufacturing Operations Consultant.
+
+Review the management dashboard below.
+
+{dashboard}
 
 IMPORTANT:
-Only use the facts provided.
-Do not invent data.
-Do not assume downtime unless explicitly stated.
 
-Identify:
+Use ONLY information explicitly present in the dashboard.
 
-1. Biggest Operational Risk
-2. Root Cause
-3. Business Impact
-4. Recommended Action
+Do NOT assume:
+- operator training issues
+- staffing issues
+- planning issues
+- supply chain problems
+- quality process issues
 
-Production Facts
+unless they are directly stated.
 
-Target Production: {production['target']}
-Projected Output: {production['projected_output']}
-Production Gap: {production['gap']}
+If the root cause cannot be proven from the dashboard,
+state:
 
-Quality Facts
+"Additional operational data is required to determine
+the root cause with confidence."
 
-Defect Rate: {quality['defect_rate']}%
-Scrap Rate: {quality['scrap_rate']}%
-Rework Rate: {quality['rework_rate']}%
 
-Maintenance Facts
+Provide:
 
-Machine: {maintenance['machine']}
-Temperature: {maintenance['temperature']}
-Vibration: {maintenance['vibration']}
-Runtime Hours: {maintenance['runtime']}
-Days Since Last Maintenance:
-{maintenance['days_since_maintenance']}
+1. Executive Summary
 
-Look for relationships between the facts.
+2. Biggest Operational Risk
 
-Keep response under 200 words.
+3. Root Cause Analysis
+
+4. Business Impact
+
+5. Priority Actions
+
+6. Recommended Leadership Focus
+
+Keep the response under 300 words.
+
+Use a professional management-consulting style.
 """
 
     return ask_llm(prompt)

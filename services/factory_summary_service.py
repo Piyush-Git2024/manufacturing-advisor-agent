@@ -442,3 +442,86 @@ def get_plant_risk_ranking():
         position += 1
 
     return "\n".join(report)
+def get_management_dashboard():
+
+    dashboard = []
+
+    dashboard.append("MANAGEMENT DASHBOARD")
+    dashboard.append("=" * 50)
+    dashboard.append("")
+
+    # ==========================================
+    # EXECUTIVE SUMMARY
+    # ==========================================
+
+    dashboard.append(get_executive_risk_summary())
+
+    dashboard.append("")
+    dashboard.append("=" * 50)
+    dashboard.append("")
+
+    # ==========================================
+    # PLANT RISK RANKING
+    # ==========================================
+
+    dashboard.append(get_plant_risk_ranking())
+
+    dashboard.append("")
+    dashboard.append("=" * 50)
+    dashboard.append("")
+
+    # ==========================================
+    # EXECUTIVE FOCUS AREAS
+    # ==========================================
+
+    dashboard.append("LEADERSHIP FOCUS")
+    dashboard.append("----------------")
+
+    dashboard.append(
+        "1. CNC101 remains the highest-risk machine due "
+        "to increasing temperature and vibration trends."
+    )
+
+    dashboard.append(
+        "2. PUN plant requires immediate attention due "
+        "to production performance issues."
+    )
+
+    dashboard.append(
+        "3. HYD-LINE-A continues to show worsening "
+        "quality indicators."
+    )
+
+    dashboard.append(
+        "4. PRESS201 requires engineering review due "
+        "to recurring operational incidents."
+    )
+
+    dashboard.append("")
+    dashboard.append("=" * 50)
+    dashboard.append("")
+
+    # ==========================================
+    # TOP RISKS
+    # ==========================================
+
+    dashboard.append("TOP OPERATIONAL RISKS")
+    dashboard.append("---------------------")
+
+    dashboard.append(
+        "HIGH: CNC101 potential equipment failure."
+    )
+
+    dashboard.append(
+        "HIGH: Continued production loss on PUN-LINE-B."
+    )
+
+    dashboard.append(
+        "MEDIUM: Quality degradation on HYD-LINE-A."
+    )
+
+    dashboard.append(
+        "MEDIUM: Repeated PRESS201 incidents."
+    )
+
+    return "\n".join(dashboard)
